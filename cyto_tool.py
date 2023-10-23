@@ -1,27 +1,8 @@
-# %% [markdown]
-# Urrutia Cytogenetics tool
+#Urrutia Cytogenetics tool
 
-# %%
 import streamlit as st
 import pandas as pd
-import numpy as np
 import re
-
-
-def load_data(data_path):
-    data = pd.read_csv(data_path)
-    return data
-
-data = load_data(data_path="Kelly MDS HMA combined/20230620mdshmakelly.csv")
-
-
-
-# %% [markdown]
-# CG STRING PROCESSING
-
-# %%
-
-#"""idem processing"""
 
 def process_idem(row):
     cytogenetics_value = str(row["Cyto at DX"])
@@ -50,31 +31,7 @@ def process_idem(row):
 
     return '/'.join(segments)
 
-data["processed_cg"] = data.apply(process_idem, axis=1)
 
-
-
-
-
-
-# %%
-# """initial string processing for appropriate format"""
-
-# def format_process(row):
-#     cytogenetics_value = str(row["processed_cg"])
-#     incalculable = ["nan", "NAN", "NaN", "inadequate", "Diploid", "diploid"]
-#     for i in incalculable:
-#         for _ in cytogenetics_value:
-#             if cytogenetics_value.__contains__(i):
-#                 return "incalculable"
-#             else:
-#                 continue
-# data["processed_cg"] = data.apply(format_process, axis=1)
-# vars = ["processed_cg", "Cyto at DX"]
-# print(data[vars])
-# data[vars].to_csv("try.csv")
-
-# %%
 def count_abn(row):
     cytogenetics_value = str(row["processed_cg"])
     
@@ -95,16 +52,10 @@ def count_abn(row):
     
     return max_abn
 
-data["abn_total"] = data.apply(count_abn, axis=1)
 
-vars = ["processed_cg", "abn_total"]
-#data[vars].to_csv("abn_counter_segment.csv")
+#VERY GOOD RISK ABNORMALITIES
 
-# %% [markdown]
-# VERY GOOD RISK ABNORMALITIES
-
-# %%
-#"""-Y(minusy)"""
+#-Y(minusy)
 
 def minusy(row):
     cytogenetics_value = row["processed_cg"]
@@ -122,12 +73,7 @@ def minusy(row):
                 return 1
     return 0
 
-data["minusy"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
-
-
-
-# %%
-# """del11q(delelevenq)"""
+#del11q(delelevenq)
 
 def elevenq(row):
     cytogenetics_value = row["processed_cg"]
@@ -145,15 +91,9 @@ def elevenq(row):
                 return 1
     return 0
 
-data["delelevenq"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
+#GOOD RISK ABNORMALITIES
 
-
-
-# %% [markdown]
-# GOOD RISK ABNORMALITIES
-
-# %%
-# """"del5q"""
+#del5q
 
 def delfiveq(row):
     cytogenetics_value = row["processed_cg"]
@@ -170,10 +110,7 @@ def delfiveq(row):
                 return 1
     return 0
 
-data['del5q'] = data.apply(lambda row: delfiveq(row) if row["abn_total"] == 1 else 0, axis=1)
-
-# %%
-# """"del12p"""
+#del12p
 
 def deltwelvep(row):
     cytogenetics_value = row["processed_cg"]
@@ -190,11 +127,9 @@ def deltwelvep(row):
                 return 1
     return 0
 
-data['del12p'] = data.apply(lambda row: deltwelvep(row) if row["abn_total"] == 1 else 0, axis=1)
 
 
-# %%
-# """del20q"""
+#del20q
 
 def deltwentyq(row):
     cytogenetics_value = row["processed_cg"]
@@ -211,14 +146,9 @@ def deltwentyq(row):
                 return 1
     return 0
 
-data['del20q'] = data.apply(lambda row: deltwentyq(row) if row["abn_total"] == 1 else 0, axis=1)
+#INTERMEDIATE RISK ABNORMALITIES
 
-
-# %% [markdown]
-# INTERMEDIATE RISK ABNORMALITIES
-
-# %%
-# """del7q"""
+#del7q 
 
 def delsevenq(row):
     cytogenetics_value = row["processed_cg"]
@@ -233,11 +163,6 @@ def delsevenq(row):
             if match:
                 return 1
     return 0
-
-data["del7q"] = data.apply(lambda row: delsevenq(row) if row["abn_total"] == 1 else 0, axis=1)
-
-
-
 
 
 # %%
@@ -257,12 +182,8 @@ def pluseight(row):
                 return 1
     return 0
 
-data["plus8"] = data.apply(lambda row: pluseight(row) if row['abn_total'] == 1 else 0, axis=1)
 
-
-
-# %%
-# """plus19"""
+#plus19
 
 def plusnineteen(row):
     cytogenetics_value = row["processed_cg"]
@@ -278,11 +199,9 @@ def plusnineteen(row):
                 return 1
     return 0
 
-data["plus19"] = data.apply(lambda row: plusnineteen(row) if row['abn_total'] == 1 else 0, axis=1)
 
 
-# %%
-# """i17q"""
+#i17q
 
 def iseventeenq(row):
     cytogenetics_value = row["processed_cg"]
@@ -298,14 +217,11 @@ def iseventeenq(row):
                 return 1
     return 0
 
-data["i17q"] = data.apply(lambda row: iseventeenq(row) if row['abn_total'] == 1 else 0, axis=1)
 
 
-# %% [markdown]
-# POOR RISK ABNORMALITIES
+#POOR RISK ABNORMALITIES 
 
-# %%
-# """minus7"""
+#minus7
 
 def minusseven(row):
     cytogenetics_value = row["processed_cg"]
@@ -323,12 +239,9 @@ def minusseven(row):
                 return 1
     return 0
 
-data["minus7"] = data.apply(lambda row: minusseven(row) if row['abn_total'] <=2 else 0, axis=1) #may need to change this
 
 
-
-# %%
-# """inv3/t3q/del3q (inv_del_t_3q)"""
+#inv3/t3q/del3q (inv_del_t_3q)
 
 def chr3abn(row):
     cytogenetics_value = row["processed_cg"]
@@ -346,14 +259,9 @@ def chr3abn(row):
                 return 1
     return 0
 
-data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row) if row["abn_total"] <=2 else 0, axis=1) #includes those with any amount of abnormalities 
 
 
-
-
-
-# %%
-# """"DEL 17p AND -17""" #not in CG risk but useful for IPSS-M calculation
+#DEL 17p AND -17 #note in CG risk but useful for IPSS-M calculation later
 
 def delseventeen(row):
     cytogenetics_value = row["processed_cg"]
@@ -370,12 +278,8 @@ def delseventeen(row):
                 return 1
     return 0
 
-data["del1717p"] = data.apply(lambda row: delseventeen(row), axis=1)
 
-
-
-# %%
-# """Diploid or 46,XX or 46,XY """
+#Diploid or 46,XX or 46,XY
 
 othervars = ["del77q", "del55q", "del1717p", "elevenq", "minusy"]
 
@@ -393,23 +297,17 @@ def diploid(row):
                 return 1
     return 0
 
-data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function needs work
 
-#data.to_csv("diploid_test.csv")
+#CG-RISK CALCULATION
 
-# %% [markdown]
-# CG-RISK CALCULATION
 
-# %%
-def segments(row):
+def segments(row): #this function is not callad in master function
     cytogenetics_value = row["processed_cg"]
     segments = cytogenetics_value.split("/")
     return len(segments)
 
-data["segments_len"] = data.apply(lambda row: segments(row), axis=1) #this is for counting clones
 
-# %%
-# """CALCULATE CG RISK"""
+#CALCULATE CG RISK
 
 intermediate_or_higher_vars = ["del7q", "minus7", "plus8", "plus19", "i17q", "inv_del_t_3q"]
 
@@ -444,10 +342,7 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
             return "manual check required"        
         
 
-data["cg_risk"] = data.apply(lambda row: cg_risk(row), axis=1)
 
-
-# %%
 def master_function(data):
     data["processed_cg"] = data.apply(process_idem, axis=1)
     data["abn_total"] = data.apply(count_abn, axis=1)
@@ -468,6 +363,7 @@ def master_function(data):
 
     return data
 
+#This is the streamlit webapp try
    
 st.title("MDS CG Processor")
 
@@ -486,64 +382,4 @@ if u_file is not None:
         st.write(processed_data)
     else:
         st.error ("The file does not have a Cyto at DX column.")
-
-
-
-# %%
-# o = (data["cg_risk"] == 0) 
-# i = (data["cg_risk"] == 1)
-# ii = (data["cg_risk"] == 2)
-# iii = (data["cg_risk"] == 3)
-# iv = (data["cg_risk"] == 4)
-
-# plt.figure(figsize=(10,8), dpi=300)
-# ax = plt.subplot(111)
-# ax.set_ylabel("Overall Survival Probability by calculated CG risk", fontsize=16)
-
-# kmfo = KaplanMeierFitter()
-# kmfo.fit(data.loc[o]["OS (mos)"], data.loc[o]["Alive 0/Dead 1"], label = "Very Good")
-# ax = kmfo.plot_survival_function(ci_alpha = 0.1, ax=ax)
-# median_time_o = kmfo.median_survival_time_
-# plt.axvline(x=median_time_o, ymax=0.5, color ="r", ls='--', lw= 0.9)
-# print(median_time_o)
-
-# kmfi = KaplanMeierFitter()
-# kmfi.fit(data.loc[i]["OS (mos)"], data.loc[i]["Alive 0/Dead 1"], label = "Good")
-# ax = kmfi.plot_survival_function(ci_alpha = 0.1, ax=ax)
-# median_time_i = kmfi.median_survival_time_
-# plt.axvline(x=median_time_i, ymax=0.5, color ="r", ls='--', lw= 0.9)
-# print(median_time_i)
-
-# kmfii = KaplanMeierFitter()
-# kmfii.fit(data.loc[ii]["OS (mos)"], data.loc[ii]["Alive 0/Dead 1"], label = "Intermediate")
-# ax = kmfii.plot_survival_function(ci_alpha = 0.1, ax=ax)
-# median_time_ii = kmfii.median_survival_time_
-# plt.axvline(x=median_time_ii, ymax=0.5, color ="r", ls='--', lw= 0.9)
-# print(median_time_ii)
-
-# kmfiii = KaplanMeierFitter()
-# kmfiii.fit(data.loc[iii]["OS (mos)"], data.loc[iii]["Alive 0/Dead 1"], label = "Poor")
-# ax = kmfiii.plot_survival_function(ci_alpha = 0.1, ax=ax)
-# median_time_iii = kmfiii.median_survival_time_
-# plt.axvline(x=median_time_iii, ymax=0.5, color ="r", ls='--', lw= 0.9)
-# print(median_time_iii)
-
-# kmfiv = KaplanMeierFitter()
-# kmfiv.fit(data.loc[iv]["OS (mos)"], data.loc[iv]["Alive 0/Dead 1"], label = "Very Poor")
-# ax = kmfiv.plot_survival_function(ci_alpha = 0.1, ax=ax)
-# median_time_iv = kmfiv.median_survival_time_
-# plt.axvline(x=median_time_iv, ymax=0.5, color ="r", ls='--', lw= 0.9)
-# print(median_time_iv)
-
-# ax.set_xlabel("Time (months)", fontsize=16)
-
-# add_at_risk_counts(kmfo, kmfi, kmfii, kmfiii, kmfiv, ax=ax, rows_to_show=["At risk"])
-# plt.tight_layout()
-# plt.show()
-
-
-# # results = multivariate_logrank_test(iwg23merge['survtime'], iwg23merge['sct'], iwg23merge['statusupdate'])
-# # results.print_summary()
-
-
 
