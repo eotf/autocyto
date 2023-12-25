@@ -71,8 +71,6 @@ def count_abn(row):
     
     return max_abn
 
-data["abn_total"] = data.apply(count_abn, axis=1)
-
 
 # VERY GOOD RISK ABNORMALITIES# %%
 #"""-Y(minusy)"""
