@@ -1,13 +1,32 @@
-#Urrutia Cytogenetics tool
+#Cytogenetics tool for MDS v1.0.1
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import re
 
-def process_idem(row):
-    cytogenetics_value = str(row["Cyto at DX"])
 
-    cytogenetics_value = cytogenetics_value.replace(" ", "")
+# CG STRING PROCESSING
+
+#--idem processing
+
+def process_idem(row):
+    cytogenetics_value = str(row["cytogenetics"])
+
+    cytogenetics_value = cytogenetics_value.replace(" ", "") #whitespace elimination
+    cytogenetics_value = cytogenetics_value.replace("{", "[" ) #bracket change
+    cytogenetics_value = cytogenetics_value.replace("}", "]" ) #bracket change
+    cytogenetics_value = cytogenetics_value.replace("]", "]/") #add / after bracet for it to detect segment
+    cytogenetics_value = cytogenetics_value.replace("];", "]/") #semi-colon change to fit split below
+    cytogenetics_value = cytogenetics_value.replace("],", "]/") #comma change to fit split below
+    cytogenetics_value = cytogenetics_value.replace("]//", "]/") #double / elimination fit split below
+
+  
+    
+    if cytogenetics_value.endswith("/"):
+        cytogenetics_value = cytogenetics_value.rstrip("/")    
+
+    cytogenetics_value = "".join([char.lower() if char not in ['X', 'Y'] else char for char in cytogenetics_value])
 
     segments = cytogenetics_value.split('/')
     
@@ -20,7 +39,7 @@ def process_idem(row):
         if 'idem' in segments[i]:
             #get the chromosomes
             chromosome_count = segments[i].split(',')[0]
-            #replace i dem with cum abnl
+            #replace idem with cum abnl
             segments[i] = chromosome_count + "," + cumulative_abnl + "," + ",".join(segments[i].split(',')[1:]).replace('idem,', '')
 
         #update the cumm abnormalities without adding duplicates
@@ -28,8 +47,9 @@ def process_idem(row):
         for abnl in current_segment_abnl.split(','):
             if abnl and abnl not in cumulative_abnl:
                 cumulative_abnl += "," + abnl
-
     return '/'.join(segments)
+
+#data["processed_cg"] = data.apply(process_idem, axis=1
 
 
 def count_abn(row):
@@ -52,10 +72,11 @@ def count_abn(row):
     
     return max_abn
 
+#data["abn_total"] = data.apply(count_abn, axis=1)
 
-#VERY GOOD RISK ABNORMALITIES
 
-#-Y(minusy)
+# VERY GOOD RISK ABNORMALITIES# %%
+#"""-Y(minusy)"""
 
 def minusy(row):
     cytogenetics_value = row["processed_cg"]
@@ -73,7 +94,10 @@ def minusy(row):
                 return 1
     return 0
 
-#del11q(delelevenq)
+#data["minusy"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
+
+
+# """del11q(delelevenq)"""
 
 def elevenq(row):
     cytogenetics_value = row["processed_cg"]
@@ -91,9 +115,9 @@ def elevenq(row):
                 return 1
     return 0
 
-#GOOD RISK ABNORMALITIES
+# GOOD RISK ABNORMALITIES
 
-#del5q
+# """"del5q"""
 
 def delfiveq(row):
     cytogenetics_value = row["processed_cg"]
@@ -110,7 +134,8 @@ def delfiveq(row):
                 return 1
     return 0
 
-#del12p
+
+# """"del12p"""
 
 def deltwelvep(row):
     cytogenetics_value = row["processed_cg"]
@@ -127,9 +152,8 @@ def deltwelvep(row):
                 return 1
     return 0
 
-
-
-#del20q
+#
+# """del20q"""
 
 def deltwentyq(row):
     cytogenetics_value = row["processed_cg"]
@@ -146,9 +170,10 @@ def deltwentyq(row):
                 return 1
     return 0
 
-#INTERMEDIATE RISK ABNORMALITIES
 
-#del7q 
+# INTERMEDIATE RISK ABNORMALITIES
+
+# """del7q"""
 
 def delsevenq(row):
     cytogenetics_value = row["processed_cg"]
@@ -165,7 +190,6 @@ def delsevenq(row):
     return 0
 
 
-# %%
 # """"plus8"""
 
 def pluseight(row):
@@ -183,7 +207,7 @@ def pluseight(row):
     return 0
 
 
-#plus19
+# """plus19"""
 
 def plusnineteen(row):
     cytogenetics_value = row["processed_cg"]
@@ -200,8 +224,7 @@ def plusnineteen(row):
     return 0
 
 
-
-#i17q
+# """i17q"""
 
 def iseventeenq(row):
     cytogenetics_value = row["processed_cg"]
@@ -219,9 +242,9 @@ def iseventeenq(row):
 
 
 
-#POOR RISK ABNORMALITIES 
+# POOR RISK ABNORMALITIES
 
-#minus7
+# """minus7"""
 
 def minusseven(row):
     cytogenetics_value = row["processed_cg"]
@@ -241,7 +264,7 @@ def minusseven(row):
 
 
 
-#inv3/t3q/del3q (inv_del_t_3q)
+# """inv3/t3q/del3q (inv_del_t_3q)"""
 
 def chr3abn(row):
     cytogenetics_value = row["processed_cg"]
@@ -261,7 +284,7 @@ def chr3abn(row):
 
 
 
-#DEL 17p AND -17 #note in CG risk but useful for IPSS-M calculation later
+# """"DEL 17p AND -17""" #not in CG risk but useful for IPSS-M calculation
 
 def delseventeen(row):
     cytogenetics_value = row["processed_cg"]
@@ -278,8 +301,11 @@ def delseventeen(row):
                 return 1
     return 0
 
+#data["del1717p"] = data.apply(lambda row: delseventeen(row), axis=1)
 
-#Diploid or 46,XX or 46,XY
+
+
+# """Diploid or 46,XX or 46,XY """
 
 othervars = ["del77q", "del55q", "del1717p", "elevenq", "minusy"]
 
@@ -298,18 +324,20 @@ def diploid(row):
     return 0
 
 
-#CG-RISK CALCULATION
+# CG-RISK CALCULATION
 
 
-def segments(row): #this function is not callad in master function
+def segments(row):
     cytogenetics_value = row["processed_cg"]
     segments = cytogenetics_value.split("/")
     return len(segments)
 
 
-#CALCULATE CG RISK
+# """CALCULATE CG RISK"""
 
 intermediate_or_higher_vars = ["del7q", "minus7", "plus8", "plus19", "i17q", "inv_del_t_3q"]
+
+higher_vars = ["minus7", "inv_del_t_3q"]
 
 def cg_risk(row): #this is the right order of resolving the if statements to call cg_risk 10/2023
     cytogenetics_value = row["processed_cg"]
@@ -320,52 +348,57 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
         if segment.endswith("[1]"):
             continue
 
+        #easy: 4 "Very Poor" if highly complex more than 3 abnormalities (see count_abn function)
         if row["abn_total"] >3:
             return 4
-        
+        #easy: "Very Good" if isolated -Y or isolated del11q
         if (row["minusy"] == 1) or (row["delelevenq"] == 1):
             return 0 
         
-        if (row["diploid"] == 1) or ((row["del12p"] == 1) and (row[intermediate_or_higher_vars].any() == 0)) or (row["del20q"] == 1 and (row[intermediate_or_higher_vars].any() == 0)) \
-        or ((row["del5q"] ==1) and (len(segments) <= 6) and (row["abn_total"]==1) and (row["diploid"] == 0) and (row[intermediate_or_higher_vars].any() == 0)):
+        #step 1 complexity, diploid must be 1, or del12p must be  isolated + abn_total = 1, or del20p must be isolated 1 + abn_total = 1, 
+        #del5q must be isolated, or del5q + other clone, except clones with intermediate or high-risk abnormalities
+        if (row["diploid"] == 1) or ((row["del12p"] == 1) and (row["abn_total"] < 2)) or (row["del20q"] == 1 and (row["abn_total"] < 2)) \
+        or ((row["del5q"] ==1) and (row["clone_total"] <=2) and (row["diploid"] == 0) and (row[intermediate_or_higher_vars].any() == 0)):
             return 1
         
-        elif (row["minus7"] == 1) or (row["inv_del_t_3q"] == 1) or ((row["minus7"] == 1) and (len(segments) == 2))\
-                or ((row["del7q"] == 1) and (len(segments) > 2)) or (row["abn_total"] == 3 ):
+        #step 2 complexity, 
+        if (row["minus7"] == 1) or (row["inv_del_t_3q"] == 1) or ((row["minus7"] == 1) and (row["clone_total"] == 2))\
+                or ((row["del7q"] == 1) and (row["clone_total"] == 2)) or (row["abn_total"] == 3 ):
             return 3
         
-        elif (row["del7q"] == 1) or (row["plus8"] == 1) or (row["plus19"] == 1) or (row["i17q"] == 1) \
-        or ((len(segments) >=2) and (row["abn_total"] <= 2) and (row["diploid"] == 0) and (row["del5q"]== 0)) or (row["abn_total"] == 2) or (row["abn_total"] == 1):
+        if ((row["del7q"] == 1) and (row["abn_total"] == 1)) or ((row["plus8"] == 1) and (row["abn_total"] == 1)) or ((row["plus19"] == 1) \
+            and (row["abn_total"] == 1)) or ((row["i17q"] == 1) and (row["abn_total"] == 1)) or ((len(segments) >=2) and (row["abn_total"] <= 2) \
+            and (row["diploid"] == 0) and (row[higher_vars].any() == 0) and (row["del5q"]== 0)) or ((row["clone_total"] == 2) and (row[higher_vars].any() == 0)):
             return 2
         
         else:
             return "manual check required"        
         
-
-
+        
 def master_function(data):
     data["processed_cg"] = data.apply(process_idem, axis=1)
+    data["clone_total"] = data.apply(lambda row: segments(row), axis=1)
     data["abn_total"] = data.apply(count_abn, axis=1)
     data["minusy"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
     data["delelevenq"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
-    data['del5q'] = data.apply(lambda row: delfiveq(row) if row["abn_total"] == 1 else 0, axis=1)
-    data['del12p'] = data.apply(lambda row: deltwelvep(row) if row["abn_total"] == 1 else 0, axis=1)
-    data['del20q'] = data.apply(lambda row: deltwentyq(row) if row["abn_total"] == 1 else 0, axis=1)
-    data["del7q"] = data.apply(lambda row: delsevenq(row) if row["abn_total"] == 1 else 0, axis=1)
-    data["plus8"] = data.apply(lambda row: pluseight(row) if row['abn_total'] == 1 else 0, axis=1)
-    data["plus19"] = data.apply(lambda row: plusnineteen(row) if row['abn_total'] == 1 else 0, axis=1)
-    data["i17q"] = data.apply(lambda row: iseventeenq(row) if row['abn_total'] == 1 else 0, axis=1)
-    data["minus7"] = data.apply(lambda row: minusseven(row) if row['abn_total'] <=2 else 0, axis=1) 
-    data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row) if row["abn_total"] <=2 else 0, axis=1) #includes those with any amount of abnormalities 
+    data['del5q'] = data.apply(lambda row: delfiveq(row), axis=1)
+    data['del12p'] = data.apply(lambda row: deltwelvep(row), axis=1)
+    data['del20q'] = data.apply(lambda row: deltwentyq(row), axis=1)
+    data["del7q"] = data.apply(lambda row: delsevenq(row), axis=1)
+    data["plus8"] = data.apply(lambda row: pluseight(row), axis=1)
+    data["plus19"] = data.apply(lambda row: plusnineteen(row), axis=1)
+    data["i17q"] = data.apply(lambda row: iseventeenq(row), axis=1)
+    data["minus7"] = data.apply(lambda row: minusseven(row), axis=1) 
+    data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row), axis=1) #includes those with any amount of abnormalities 
     data["del1717p"] = data.apply(lambda row: delseventeen(row), axis=1)
     data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function mayu need work needs work
     data["cg_risk"] = data.apply(lambda row: cg_risk(row), axis=1)
+    data["number of clones"] = data.apply(lambda row: segments(row), axis=1)
 
     return data
 
-#This is the streamlit webapp try
    
-st.title("MDS CG Processor")
+st.title("MDS CG Processing Tool")
 
 u_file = st.file_uploader("Please upload a CSV file (please convert your Excel file to CSV prior to uploading and name your CG column 'cytogenetics')", type =['csv'])
 
@@ -376,10 +409,19 @@ if u_file is not None:
     st.write("Original Data")
     st.write(data)
 
-    if 'Cyto at DX' in data.columns:
+    if 'cytogenetics' in data.columns:
         processed_data = master_function(data.copy())
         st.write("Processed Data")
         st.write(processed_data)
-    else:
-        st.error ("The file does not have a Cyto at DX column.")
 
+        proc_data = processed_data.to_csv(index=False)
+
+        st.download_button(
+            label = "Download Processed Data",
+            data = proc_data,
+            file_name="processed_cytogenetic_data.csv",
+            mime = "text/csv"
+        )
+
+    else:
+        st.error ("The file does not have a column named 'cytogenetics'")
