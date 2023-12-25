@@ -1,4 +1,4 @@
-#Cytogenetics tool for MDS v1.0.1
+#Cytogenetics tool for MDS v1.0.3
 
 import streamlit as st
 import pandas as pd
@@ -49,7 +49,6 @@ def process_idem(row):
                 cumulative_abnl += "," + abnl
     return '/'.join(segments)
 
-#data["processed_cg"] = data.apply(process_idem, axis=1
 
 
 def count_abn(row):
@@ -72,7 +71,6 @@ def count_abn(row):
     
     return max_abn
 
-#data["abn_total"] = data.apply(count_abn, axis=1)
 
 
 # VERY GOOD RISK ABNORMALITIES# %%
@@ -94,8 +92,6 @@ def minusy(row):
                 return 1
     return 0
 
-#data["minusy"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
-
 
 # """del11q(delelevenq)"""
 
@@ -105,7 +101,7 @@ def elevenq(row):
     segments = cytogenetics_value.split('/')
 
     for segment in segments:
-        if segment.endswith('[1]'):  #this terms makes them ignore those with [1] abnormality. 
+        if segment.endswith('[1]'): 
             continue
 
         if isinstance(segment, str):
@@ -301,9 +297,6 @@ def delseventeen(row):
                 return 1
     return 0
 
-#data["del1717p"] = data.apply(lambda row: delseventeen(row), axis=1)
-
-
 
 # """Diploid or 46,XX or 46,XY """
 
@@ -396,7 +389,7 @@ def master_function(data):
     data["minus7"] = data.apply(lambda row: minusseven(row), axis=1) 
     data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row), axis=1) #includes those with any amount of abnormalities 
     data["del1717p"] = data.apply(lambda row: delseventeen(row), axis=1)
-    data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function mayu need work needs work
+    data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function may need work
     data["cg_risk"] = data.apply(lambda row: cg_risk(row), axis=1)
     #data["number of clones"] = data.apply(lambda row: segments(row), axis=1)
 
