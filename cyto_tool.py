@@ -375,6 +375,7 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
 def master_function(data):
     data["processed_cg"] = data.apply(process_idem, axis=1)    
     data["abn_total"] = data.apply(count_abn, axis=1)
+    data["clone_total"] = data.apply(lambda row: segments(row), axis=1)
     data["minusy"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
     data["delelevenq"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
     data['del5q'] = data.apply(lambda row: delfiveq(row), axis=1)
