@@ -330,6 +330,11 @@ def diploid(row):
 def segments(row):
     cytogenetics_value = row["processed_cg"]
     segments = cytogenetics_value.split("/")
+    
+    for segment in segments:
+        if segment.endswith('[1]'): #ignoring the [1] segments
+            continue
+            
     return len(segments)
 
 
