@@ -359,7 +359,7 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
             return 1
         
         #step 2 complexity, minus7 or del7 + another, -7 alone, abn3 any, or 3 abnormalities (complex=3)
-        if (row["minus7"] == 1) or (row["inv_del_t_3q"] == 1) or ((row["minus7"] == 1) and (row["clone_total"] == 2)) or ((row["del7q"] == 1) and (row["clone_total"] == 2)) or (row["abn_total"] == 3 ):
+        if (row["minus7"] == 1) or (row["inv_del_t_3q"] == 1) or ((row["minus7"] == 1) and (row["abn_total"] == 2)) or ((row["del7q"] == 1) and (row["abn_total"] == 2)) or (row["abn_total"] == 3 ):
             return 3
 
         #basically almost anything else, isolated del7q, isolated +8, isolated +19, isolated i17q, or clone >=2 and abn total =2, or any other clone,
