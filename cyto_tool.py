@@ -352,7 +352,7 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
             return 4
             
         #easy: "Very Good" if isolated -Y or isolated del11q
-        if ((row["minusy"] == 1) and (row[good_vars] ==0)) or ((row["delelevenq"] == 1) and (row[good_vars] ==0)):
+        if ((row["minusy"] == 1) and (row[good_vars].any() ==0)) or ((row["delelevenq"] == 1) and (row[good_vars].any() ==0)):
             return 0 
         
         #step 1 complexity, diploid must be 1, or del12p must be  isolated + abn_total = 1, or del20p must be isolated 1 + abn_total = 1, 
