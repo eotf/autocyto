@@ -393,9 +393,9 @@ def master_function(data):
     return data
 
    
-st.title("MDS Cytogenetic Risk and Abnormalities Processing Tool")
+st.title("Cytogenetic risk and abnormality tool for myelodysplastic syndrome")
 
-u_file = st.file_uploader("Please upload a CSV file (please convert your Excel file to CSV prior to uploading and name your cytogenetics column 'cytogenetics'. Sample content for each cell: 46,XX[20], 46,XY,+19,del(17)(p11.2)[1]/46,XY[19]", type =['csv'])
+u_file = st.file_uploader("Please upload a CSV file. Please convert your Excel file to CSV prior to uploading and name your cytogenetics column 'cytogenetics'. Sample content for each cell: 46,XX[20], 46,XY,+19,del(17)(p11.2)[1]/46,XY[19]", type =['csv'])
 
 if u_file is not None:
     if u_file.name.endswith('.csv'):
