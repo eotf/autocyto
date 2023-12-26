@@ -348,26 +348,23 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
         #easy: 4 "Very Poor" if highly complex more than 3 abnormalities (see count_abn function)
         if row["abn_total"] >3:
             return 4
+            
         #easy: "Very Good" if isolated -Y or isolated del11q
         if (row["minusy"] == 1) or (row["delelevenq"] == 1):
             return 0 
         
         #step 1 complexity, diploid must be 1, or del12p must be  isolated + abn_total = 1, or del20p must be isolated 1 + abn_total = 1, 
         #del5q must be isolated, or del5q + other clone, except clones with intermediate or high-risk abnormalities
-        if (row["diploid"] == 1) or ((row["del12p"] == 1) and (row["abn_total"] < 2)) or ((row["del20q"] == 1 and (row["abn_total"] < 2)) \
-            or ((row["del5q"] ==1) and (row["clone_total"] <=2) and (row["diploid"] == 0) and (row[intermediate_or_higher_vars].any() == 0)):
+        if (row["diploid"] == 1) or ((row["del12p"] == 1) and (row["abn_total"] < 2)) or ((row["del20q"] == 1 and (row["abn_total"] < 2)) or ((row["del5q"] ==1) and (row["clone_total"] <=2) and (row["diploid"] == 0) and (row[intermediate_or_higher_vars].any() == 0)):
             return 1
         
         #step 2 complexity, minus7 or del7 + another, -7 alone, abn3 any, or 3 abnormalities (complex=3)
-        if (row["minus7"] == 1) or (row["inv_del_t_3q"] == 1) or ((row["minus7"] == 1) and (row["clone_total"] == 2))\
-                or ((row["del7q"] == 1) and (row["clone_total"] == 2)) or (row["abn_total"] == 3 ):
+        if (row["minus7"] == 1) or (row["inv_del_t_3q"] == 1) or ((row["minus7"] == 1) and (row["clone_total"] == 2)) or ((row["del7q"] == 1) and (row["clone_total"] == 2)) or (row["abn_total"] == 3 ):
             return 3
 
         #basically almost anything else, isolated del7q, isolated +8, isolated +19, isolated i17q, or clone >=2 and abn total =2, or any other clone,
         #with diploid, del5q, intermediate or higher vars have to be 0
-        if ((row["del7q"] == 1) and (row["abn_total"] == 1)) or ((row["plus8"] == 1) and (row["abn_total"] == 1)) or ((row["plus19"] == 1) \
-            and (row["abn_total"] == 1)) or ((row["i17q"] == 1) and (row["abn_total"] == 1)) or ((len(segments) >=2) and (row["abn_total"] <= 2) \
-            and (row["diploid"] == 0) and (row[higher_vars].any() == 0) and (row["del5q"]== 0)) or ((row["clone_total"] == 2) and (row[higher_vars].any() == 0)):
+        if ((row["del7q"] == 1) and (row["abn_total"] == 1)) or ((row["plus8"] == 1) and (row["abn_total"] == 1)) or ((row["plus19"] == 1) and (row["abn_total"] == 1)) or ((row["i17q"] == 1) and (row["abn_total"] == 1)) or ((len(segments) >=2) and (row["abn_total"] <= 2) and (row["diploid"] == 0) and (row[higher_vars].any() == 0) and (row["del5q"]== 0)) or ((row["clone_total"] == 2) and (row[higher_vars].any() == 0)):
             return 2
         
         else:
