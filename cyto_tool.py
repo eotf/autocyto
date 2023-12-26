@@ -355,7 +355,7 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
         #step 1 complexity, diploid must be 1, or del12p must be  isolated + abn_total = 1, or del20p must be isolated 1 + abn_total = 1, 
         #del5q must be isolated, or del5q + other clone, except clones with intermediate or high-risk abnormalities
         if (row["diploid"] == 1) or ((row["del12p"] == 1) and (row["abn_total"] < 2)) or ((row["del20q"] == 1 and (row["abn_total"] < 2)) \
-        or ((row["del5q"] ==1) and (row["clone_total"] <=2) and (row["diploid"] == 0) and (row[intermediate_or_higher_vars].any() == 0)):
+            or ((row["del5q"] ==1) and (row["clone_total"] <=2) and (row["diploid"] == 0) and (row[intermediate_or_higher_vars].any() == 0)):
             return 1
         
         #step 2 complexity, minus7 or del7 + another, -7 alone, abn3 any, or 3 abnormalities (complex=3)
