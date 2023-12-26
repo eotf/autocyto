@@ -397,6 +397,15 @@ st.title("Cytogenetic risk and abnormality tool for myelodysplastic syndrome")
 
 u_file = st.file_uploader("Please upload a CSV file. Please convert your Excel file to CSV prior to uploading and name your cytogenetics column 'cytogenetics'. Sample content for each cell: 46,XX[20], 46,XY,+19,del(17)(p11.2)[1]/46,XY[19]", type =['csv'])
 
+if st.button('Disclaimer'):
+    st.write("Disclaimer: This is a sample app. Please use it responsibly.")
+
+st.markdown("""
+#### Contact Information
+- **Created by:** Samuel Urrutia
+- **Email:** sam537@fastmail.com
+""")
+
 if u_file is not None:
     if u_file.name.endswith('.csv'):
         data = pd.read_csv(u_file)
