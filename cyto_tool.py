@@ -389,8 +389,13 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
         if ((row["abn_total"]<=2) and (row[good_vars].any()==0) and (row[intermediate_or_higher_vars].any() ==0) and (row["del5q"]==0)):
             return 2
         
+        if not any(char.isdigit() for char in segment):
+            return "manual check required"
+        
         else:
-            return "manual check required"        
+            return "manual check required"    
+    
+    return "manual check required"    
         
         
 def master_function(data):
