@@ -332,6 +332,8 @@ def segments(row):
 
 # """CALCULATE CG RISK"""
 
+good_vars = ["del20q", "del12p", "del5q"]
+
 intermediate_or_higher_vars = ["del7q", "minus7", "plus8", "plus19", "i17q", "inv_del_t_3q"]
 
 higher_vars = ["minus7", "inv_del_t_3q"]
@@ -350,7 +352,7 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
             return 4
             
         #easy: "Very Good" if isolated -Y or isolated del11q
-        if (row["minusy"] == 1) or (row["delelevenq"] == 1):
+        if ((row["minusy"] == 1) and (row[good_vars] ==0)) or ((row["delelevenq"] == 1) and (row[good_vars] ==0)):
             return 0 
         
         #step 1 complexity, diploid must be 1, or del12p must be  isolated + abn_total = 1, or del20p must be isolated 1 + abn_total = 1, 
