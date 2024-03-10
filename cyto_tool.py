@@ -472,7 +472,8 @@ def master_function(data):
 
 st.title("Cytogenetic risk and IPSS-R calculator for myelodysplastic syndrome")
 
-st.write("Please enter the column names in your file without spaces below:")
+st.markdown("""Please enter the column names in your file without spaces below: 
+            Please make sure your columns contain **only** numeric values.""")
 cytovar = st.text_input("Enter the name of the cytogenetics column (better performance with ISCN 2020)")
 blastvar = st.text_input("Enter the name of the bone marrow blast column in percentage (e.g., normal = 2)")
 hbvar= st.text_input("Enter the name of the hemoglobin column in g/dl (e.g., normal = 14)")
