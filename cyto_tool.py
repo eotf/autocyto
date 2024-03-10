@@ -386,9 +386,7 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
             ((row["clone_total"] >= 2) and (row["abn_total"] <= 2) and (row["diploid"] == 0) and (row[higher_vars].any() == 0) and (row["del5q"]== 0)) or \
             ((row["clone_total"] == 2) and (row[higher_vars].any() == 0)):
             return 2
-        
-        if ((row["abn_total"]<=2) and (row[good_vars].any()==0) and (row[intermediate_or_higher_vars].any() ==0) and (row["del5q"]==0)):
-            return 2
+    
         
         if not any(char.isdigit() for char in segment):
             return "manual check required"
