@@ -491,6 +491,7 @@ st.markdown("""
 #### Contact Information:
 - **Created by:** Samuel Urrutia
 - **Email:** surrutia@mdanderson.org
+- All files are deleted upon closing the browser.
 """)
 
 if u_file is not None:
