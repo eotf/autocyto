@@ -1,7 +1,8 @@
-#Cytogenetics tool for MDS v1.0.3
+#Cytogenetics and IPSS-R tool for MDS v1.1.0
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import re
 
 
@@ -10,7 +11,7 @@ import re
 #--idem processing
 
 def process_idem(row):
-    cytogenetics_value = str(row["cytogenetics"])
+    cytogenetics_value = str(row[cytovar])
 
     cytogenetics_value = cytogenetics_value.replace(" ", "") #whitespace elimination
     cytogenetics_value = cytogenetics_value.replace("{", "[" ) #bracket change
@@ -396,14 +397,22 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
             return "manual check required"    
     
     return "manual check required"    
+
+
+def check_numeric_and_sum(row):
+    if row.apply(lambda x: isinstance(x, str)).any():
+        return "manual check required"
+    else:
+        return row.sum()
+
         
         
 def master_function(data):
     data["processed_cg"] = data.apply(process_idem, axis=1)    
     data["abn_total"] = data.apply(count_abn, axis=1)
     data["clone_total"] = data.apply(lambda row: segments(row), axis=1)
-    data["minusy"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
-    data["delelevenq"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
+    data["loss_of_Y"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
+    data["del11q"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
     data['del5q'] = data.apply(lambda row: delfiveq(row), axis=1)
     data['del12p'] = data.apply(lambda row: deltwelvep(row), axis=1)
     data['del20q'] = data.apply(lambda row: deltwentyq(row), axis=1)
@@ -413,46 +422,105 @@ def master_function(data):
     data["i17q"] = data.apply(lambda row: iseventeenq(row), axis=1)
     data["minus7"] = data.apply(lambda row: minusseven(row), axis=1) 
     data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row), axis=1) #includes those with any amount of abnormalities 
-    data["del1717p"] = data.apply(lambda row: delseventeen(row), axis=1)
+    data["del17or17p"] = data.apply(lambda row: delseventeen(row), axis=1)
     data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function may need work
-    data["cg_risk"] = data.apply(lambda row: cg_risk(row), axis=1)
+    data["cg_risk_ipssr"] = data.apply(lambda row: cg_risk(row), axis=1)
 
+    conditionshb = [
+        data[hbvar] < 8,  # Low
+        (data[hbvar] >= 8) & (data[hbvar] < 10),  # Moderate
+    ]
+    choiceshb = [1.5, 1]
+    data["hbrisk"] = np.select(conditionshb, choiceshb, default=0)
+
+    conditionsplt =[
+        data[pltvar] < 50,
+        (data[pltvar] >= 100) & (data[pltvar] < 100),
+    ]
+    choicesplt = [1, 0.5]
+    data["pltrisk"] = np.select(conditionsplt, choicesplt, default=0)
+
+    conidtionsanc = [
+        data[ancvar] < 0.5
+    ]
+    choicesanc = [0.5]
+    data["ancrisk"] = np.select(conidtionsanc, choicesanc, default=0)
+
+    conditionsblasts = [
+        (data[blastvar] > 10),  
+        (data[blastvar] <= 10) & (data[blastvar] > 5),  
+        (data[blastvar] <= 5) & (data[blastvar] > 2),  
+        (data[blastvar] <= 2),
+    ]
+    chocicesblasts = [3,2,1,0]
+    data["blastrisk"] = np.select(conditionsblasts, chocicesblasts)
+
+    ipssr_cols = ['ancrisk', 'blastrisk', 'pltrisk', 'hbrisk', 'cg_risk']
+
+    data['IPSS_R_scores'] = data[ipssr_cols].apply(check_numeric_and_sum, axis=1)
+
+    conditionipssr = [
+        data["IPSS_R_scores"].apply(lambda x: x > 0 and x <= 1.5 if isinstance(x, (int, float)) else False),  #VL
+        data["IPSS_R_scores"].apply(lambda x: x > 1.5 and x <= 3 if isinstance(x, (int, float)) else False),  #L
+        data["IPSS_R_scores"].apply(lambda x: x > 3 and x <= 4.5 if isinstance(x, (int, float)) else False),  #I
+        data["IPSS_R_scores"].apply(lambda x: x > 4.5 and x <= 6 if isinstance(x, (int, float)) else False),  #H
+        data["IPSS_R_scores"].apply(lambda x: x > 6 if isinstance(x, (int, float)) else False), #VH
+    ]
+
+    choicesipssr = ["Very Low", "Low", "Intermediate", "High", "Very High"]
+    data["IPSS_R_cat"] = np.select(conditionipssr, choicesipssr, default="manual check required")
+    
     return data
 
-   
-st.title("Cytogenetic risk and abnormality tool for myelodysplastic syndrome")
+st.title("Cytogenetic risk and IPSS-R calculator for myelodysplastic syndrome")
 
-u_file = st.file_uploader("Please upload a CSV file. Please convert your Excel file to CSV prior to uploading and name your cytogenetics column 'cytogenetics'. Sample content for each cell: 46,XX[20], 46,XY,+19,del(17)(p11.2)[1]/46,XY[19]", type =['csv'])
+st.write("Please enter the column names in your file without spaces below:")
+cytovar = st.text_input("Enter the name of the cytogenetics column (better performance with ISCN 2020)")
+blastvar = st.text_input("Enter the name of the bone marrow blast column in percentage (e.g., normal = 2)")
+hbvar= st.text_input("Enter the name of the hemoglobin column in g/dl (e.g., normal = 14)")
+pltvar = st.text_input("Enter the name of the platelet column in x10^9/L (e.g., normal = 300)")
+ancvar = st.text_input("Enter the name of the ANC column x10^9/L (e.g., normal = 2.5)")
+
+u_file = st.file_uploader("Please upload a CSV file. Please convert your Excel file to CSV prior to uploading.", type =['csv'])
+
+inputvars = [blastvar,hbvar,pltvar,ancvar]
 
 if st.button('Disclaimer'):
-    st.write("Disclaimer: This is a sample app. Please use it responsibly.")
+    st.write("This is an app in development. Pease check the results. The cytogenetic risk caller performs better (>99%) with ISCN 2020 nomenclature.")
 
 st.markdown("""
-#### Contact Information
+#### Contact Information:
 - **Created by:** Samuel Urrutia
-- **Email:** sam537@fastmail.com
+- **Email:** surrutia@mdanderson.org
 """)
 
 if u_file is not None:
     if u_file.name.endswith('.csv'):
         data = pd.read_csv(u_file)
+        st.write("Original Data")
+        st.write(data)
+     
+        try:
+            for var in inputvars:
+                data[var] = pd.to_numeric(data[var], errors='coerce')
+            if data[inputvars].isnull().any().any():
+                st.write("ANC, hemoglobin, or platelets contain non-numeric values that could not be converted. Please edit your file and try again.")
+            else:
+                processed_data = master_function(data.copy())
+                st.write("Processed Data")
+                st.write(processed_data)
 
-    st.write("Original Data")
-    st.write(data)
+                proc_data = processed_data.to_csv(index=False)
 
-    if 'cytogenetics' in data.columns:
-        processed_data = master_function(data.copy())
-        st.write("Processed Data")
-        st.write(processed_data)
+                st.download_button(
+                    label="Download Processed Data",
+                    data=proc_data,
+                    file_name="processed_cytogenetic_data.csv",
+                    mime="text/csv"
+                )
+        except Exception as e:
+            st.write(f"An error occurred: {e}")
+else:
+    st.write("Please upload a file.")
 
-        proc_data = processed_data.to_csv(index=False)
-
-        st.download_button(
-            label = "Download Processed Data",
-            data = proc_data,
-            file_name="processed_cytogenetic_data.csv",
-            mime = "text/csv"
-        )
-
-    else:
-        st.error ("The file does not have a column named 'cytogenetics'")
+    
