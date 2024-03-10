@@ -373,7 +373,7 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
         if (row["minus7"] == 1) or \
             (row["inv_del_t_3q"] == 1) or \
             ((row["minus7"] == 1) and (row["clone_total"] == 2)) or \
-            ((row["del7q"] == 1) and (row["clone_total"] == 2)) or \
+            ((row["del7q"] == 1) and (row["abn_total"] >= 2)) or \
             (row["abn_total"] == 3 ):
             return 3
 
