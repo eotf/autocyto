@@ -439,7 +439,7 @@ def master_function(data):
     data["pltrisk"] = np.select(conditionsplt, choicesplt, default=0)
 
     conidtionsanc = [
-        data[ancvar] < 0.5
+        data[ancvar] < 0.8
     ]
     choicesanc = [0.5]
     data["ancrisk"] = np.select(conidtionsanc, choicesanc, default=0)
