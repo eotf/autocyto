@@ -433,7 +433,7 @@ def master_function(data):
 
     conditionsplt =[
         data[pltvar] < 50,
-        (data[pltvar] >= 100) & (data[pltvar] < 100),
+        (data[pltvar] >= 50) & (data[pltvar] < 100),
     ]
     choicesplt = [1, 0.5]
     data["pltrisk"] = np.select(conditionsplt, choicesplt, default=0)
