@@ -458,7 +458,7 @@ def master_function(data):
     data['IPSS_R_scores'] = data[ipssr_cols].apply(check_numeric_and_sum, axis=1)
 
     conditionipssr = [
-        data["IPSS_R_scores"].apply(lambda x: x > 0 and x <= 1.5 if isinstance(x, (int, float)) else False),  #VL
+        data["IPSS_R_scores"].apply(lambda x: x => 0 and x <= 1.5 if isinstance(x, (int, float)) else False),  #VL
         data["IPSS_R_scores"].apply(lambda x: x > 1.5 and x <= 3 if isinstance(x, (int, float)) else False),  #L
         data["IPSS_R_scores"].apply(lambda x: x > 3 and x <= 4.5 if isinstance(x, (int, float)) else False),  #I
         data["IPSS_R_scores"].apply(lambda x: x > 4.5 and x <= 6 if isinstance(x, (int, float)) else False),  #H
