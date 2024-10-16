@@ -409,8 +409,8 @@ def master_function(data):
     data["processed_cg"] = data.apply(process_idem, axis=1)    
     data["abn_total"] = data.apply(count_abn, axis=1)
     data["clone_total"] = data.apply(lambda row: segments(row), axis=1)
-    data["loss_of_Y"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
-    data["del11q"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
+    data["minusy"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
+    data["delelevenq"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
     data['del5q'] = data.apply(lambda row: delfiveq(row), axis=1)
     data['del12p'] = data.apply(lambda row: deltwelvep(row), axis=1)
     data['del20q'] = data.apply(lambda row: deltwentyq(row), axis=1)
@@ -420,7 +420,7 @@ def master_function(data):
     data["i17q"] = data.apply(lambda row: iseventeenq(row), axis=1)
     data["minus7"] = data.apply(lambda row: minusseven(row), axis=1) 
     data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row), axis=1) #includes those with any amount of abnormalities 
-    data["del17or17p"] = data.apply(lambda row: delseventeen(row), axis=1)
+    data["del1717p"] = data.apply(lambda row: delseventeen(row), axis=1)
     data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function may need work
     data["cg_risk_ipssr"] = data.apply(lambda row: cg_risk(row), axis=1)
 
@@ -433,13 +433,13 @@ def master_function(data):
 
     conditionsplt =[
         data[pltvar] < 50,
-        (data[pltvar] >= 100) & (data[pltvar] < 100),
+        (data[pltvar] >= 50) & (data[pltvar] < 100),
     ]
     choicesplt = [1, 0.5]
     data["pltrisk"] = np.select(conditionsplt, choicesplt, default=0)
 
     conidtionsanc = [
-        data[ancvar] < 0.5
+        data[ancvar] < 0.8
     ]
     choicesanc = [0.5]
     data["ancrisk"] = np.select(conidtionsanc, choicesanc, default=0)
@@ -453,12 +453,12 @@ def master_function(data):
     chocicesblasts = [3,2,1,0]
     data["blastrisk"] = np.select(conditionsblasts, chocicesblasts)
 
-    ipssr_cols = ['ancrisk', 'blastrisk', 'pltrisk', 'hbrisk', 'cg_risk']
+    ipssr_cols = ['ancrisk', 'blastrisk', 'pltrisk', 'hbrisk', 'cg_risk_ipssr']
 
     data['IPSS_R_scores'] = data[ipssr_cols].apply(check_numeric_and_sum, axis=1)
 
     conditionipssr = [
-        data["IPSS_R_scores"].apply(lambda x: x > 0 and x <= 1.5 if isinstance(x, (int, float)) else False),  #VL
+        data["IPSS_R_scores"].apply(lambda x: x >= 0 and x <= 1.5 if isinstance(x, (int, float)) else False),  #VL
         data["IPSS_R_scores"].apply(lambda x: x > 1.5 and x <= 3 if isinstance(x, (int, float)) else False),  #L
         data["IPSS_R_scores"].apply(lambda x: x > 3 and x <= 4.5 if isinstance(x, (int, float)) else False),  #I
         data["IPSS_R_scores"].apply(lambda x: x > 4.5 and x <= 6 if isinstance(x, (int, float)) else False),  #H
