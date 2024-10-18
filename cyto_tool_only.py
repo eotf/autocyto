@@ -1,4 +1,4 @@
-#Cytogenetics ONLY tool for MDS v1.2.0
+#Cytogenetics ONLY tool for MDS v1.2.1
 
 import streamlit as st
 import pandas as pd
@@ -354,8 +354,8 @@ def cg_risk(row): #this is the right order of resolving the if statements to cal
             return 4
             
         #easy: "Very Good" if isolated -Y or isolated del11q
-        if ((row["minusy"] == 1) and (row[good_vars].any() ==0) and (row[intermediate_or_higher_vars].any() ==0)) or \
-            ((row["delelevenq"] == 1) and (row[good_vars].any() ==0) and (row[intermediate_or_higher_vars].any() ==0)):
+        if ((row["loss_of_y"] == 1) and (row[good_vars].any() ==0) and (row[intermediate_or_higher_vars].any() ==0)) or \
+            ((row["del11q"] == 1) and (row[good_vars].any() ==0) and (row[intermediate_or_higher_vars].any() ==0)):
             return 0 
         
         #step 1 complexity, 
@@ -409,7 +409,7 @@ def master_function(data):
     data["processed_cg"] = data.apply(process_idem, axis=1)    
     data["abn_total"] = data.apply(count_abn, axis=1)
     data["clone_total"] = data.apply(lambda row: segments(row), axis=1)
-    data["loss_of_Y"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
+    data["loss_of_y"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
     data["del11q"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
     data['del5q'] = data.apply(lambda row: delfiveq(row), axis=1)
     data['del12p'] = data.apply(lambda row: deltwelvep(row), axis=1)
