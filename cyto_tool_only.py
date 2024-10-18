@@ -423,6 +423,8 @@ def master_function(data):
     data["del17or17p"] = data.apply(lambda row: delseventeen(row), axis=1)
     data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function may need work
 
+    return data
+
 
 st.title("Cytogenetic risk calculator for myelodysplastic syndrome")
 
