@@ -1,4 +1,4 @@
-#Cytogenetics and IPSS-R tool for MDS v1.1.0
+#Cytogenetics ONLY tool for MDS v1.2.0
 
 import streamlit as st
 import pandas as pd
@@ -422,6 +422,8 @@ def master_function(data):
     data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row), axis=1) #includes those with any amount of abnormalities 
     data["del17or17p"] = data.apply(lambda row: delseventeen(row), axis=1)
     data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function may need work
+    data["cg_risk_ipssr"] = data.apply(lambda row: cg_risk(row), axis=1)
+
 
     return data
 
@@ -436,7 +438,7 @@ cytovar = st.text_input("Enter the name of the cytogenetics column (better perfo
 u_file = st.file_uploader("Please upload a CSV file. Please convert your Excel file to CSV prior to uploading.", type =['csv'])
 
 if st.button('Disclaimer'):
-    st.write("This is an app in development. Pease check the results. The cytogenetic risk caller performs better (>99%) with ISCN 2020 nomenclature.")
+    st.write("This is an app in development. Pease check the results. The cytogenetic risk caller performs better (>99%) with ISCN 2020 nomenclature. If the app is unsure it will call for a manual check for the specific row")
 
 st.markdown("""
 #### Contact Information:
