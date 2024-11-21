@@ -308,12 +308,17 @@ def diploid(row):
     for segment in segments:
         if segment.endswith('[1]'):
             continue
-        if isinstance(cytogenetics_value, str):
-            pattern = r'46,XX\[|46,XY\[|Diploid CG'
-            match = re.search(pattern, cytogenetics_value)
+    
+        pattern = r'(46,XX|46,XY)\[(\d+)\]'
+            match = re.search(pattern, segment)
             if match:
-                return 1
-    return 0
+                metaphase_count = int(match.group(2))
+                if metaphase_count >= 10:
+                    return 1  # High confidence
+                else:
+                    return "1 (low confidence)"  # Low confidence
+
+    return 0  # Not diploid
 
 
 # CG-RISK CALCULATION
