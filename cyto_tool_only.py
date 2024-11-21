@@ -424,8 +424,8 @@ def master_function(data):
     data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function may need work
     data["cg_risk_score"] = data.apply(lambda row: cg_risk(row), axis=1)
 
-
-    return data
+    cols = ["loss_of_y", "del11q","del5q", "del12p", "del20q", "del7q", "plus8", "plus19", "i17q", "minus7", "inv_del_t_3q", "del17or17p", "diploid", "cg_risk_score"]
+    return data[cols]
 
 
 st.title("Cytogenetic risk calculator for myelodysplastic syndrome")
