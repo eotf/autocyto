@@ -309,7 +309,7 @@ def diploid(row):
         if segment.endswith('[1]'):
             continue
     
-        pattern = r'(46,XX|46,XY)\[(\d+)\]'
+            pattern = r'(46,XX|46,XY)\[(\d+)\]'
             match = re.search(pattern, segment)
             if match:
                 metaphase_count = int(match.group(2))
