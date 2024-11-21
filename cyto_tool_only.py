@@ -438,7 +438,7 @@ cytovar = st.text_input("Enter the name of the cytogenetics column (better perfo
 u_file = st.file_uploader("Please upload a CSV file. Please convert your Excel file to CSV prior to uploading.", type =['csv'])
 
 if st.button('Disclaimer'):
-    st.write("This is an app in development. Pease check the results. The cytogenetic risk caller performs better (>99%) with ISCN 2020 nomenclature. If the app is unsure it will call for a manual check for the specific row")
+    st.write("This is a first relaease app. Please check the results. The cytogenetic risk caller performs better (>99%) with ISCN 2020 nomenclature. If the app is unsure it will call for a manual check for the specific row")
 
 st.markdown("""
 #### Contact Information:
