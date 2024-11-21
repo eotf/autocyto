@@ -316,7 +316,7 @@ def diploid(row):
                 if metaphase_count >= 10:
                     return 1  # High confidence
                 else:
-                    return "1 (low confidence)"  # Low confidence
+                    return 2 # Low confidence
 
     return 0  # Not diploid
 
