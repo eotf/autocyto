@@ -309,14 +309,14 @@ def diploid(row):
         if segment.endswith('[1]'):
             continue
     
-            pattern = r'(46,XX|46,XY)\[(\d+)\]'
-            match = re.search(pattern, segment)
-            if match:
-                metaphase_count = int(match.group(2))
-                if metaphase_count >= 10:
-                    return 1  # High confidence
-                else:
-                    return 2 # Low confidence
+        pattern = r'(46,XX|46,XY)\[(\d+)\]'
+        match = re.search(pattern, segment)
+        if match:
+            metaphase_count = int(match.group(2))
+            if metaphase_count >= 10:
+                return 1  # High confidence
+            else:
+                return 2 # Low confidence
 
     return 0  # Not diploid
 
