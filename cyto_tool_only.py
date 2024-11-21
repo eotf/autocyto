@@ -407,8 +407,8 @@ def check_numeric_and_sum(row):
         
 def master_function(data):
     data["processed_cg"] = data.apply(process_idem, axis=1)    
-    data["abn_total"] = data.apply(count_abn, axis=1)
-    data["clone_total"] = data.apply(lambda row: segments(row), axis=1)
+    #data["abn_total"] = data.apply(count_abn, axis=1)
+    #data["clone_total"] = data.apply(lambda row: segments(row), axis=1)
     data["loss_of_y"] = data.apply(lambda row: minusy(row) if row["abn_total"] == 1 else 0, axis=1)
     data["del11q"] = data.apply(lambda row: elevenq(row) if row["abn_total"] == 1 else 0, axis=1)
     data['del5q'] = data.apply(lambda row: delfiveq(row), axis=1)
@@ -422,7 +422,7 @@ def master_function(data):
     data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row), axis=1) #includes those with any amount of abnormalities 
     data["del17or17p"] = data.apply(lambda row: delseventeen(row), axis=1)
     data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function may need work
-    data["cg_risk_ipssr"] = data.apply(lambda row: cg_risk(row), axis=1)
+    data["cg_risk_score"] = data.apply(lambda row: cg_risk(row), axis=1)
 
 
     return data
