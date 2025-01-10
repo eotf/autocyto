@@ -446,7 +446,7 @@ def master_function(data):
     data["metaphase"] = data.apply(lambda row: metaphase(row), axis =1)
     data["cg_risk_score"] = data.apply(lambda row: cg_risk(row), axis=1)
 
-    cols = [cytovar, "loss_of_y", "del11q","del5q", "del12p", "del20q", "del7q", "plus8", "plus19", "i17q", "minus7", "inv_del_t_3q", "del17or17p", "diploid", "cg_risk_score"]
+    cols = [cytovar, "metaphase", "loss_of_y", "del11q","del5q", "del12p", "del20q", "del7q", "plus8", "plus19", "i17q", "minus7", "inv_del_t_3q", "del17or17p", "diploid", "cg_risk_score"]
     return data[cols]
 
 
