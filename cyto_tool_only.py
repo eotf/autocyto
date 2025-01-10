@@ -329,6 +329,8 @@ def metaphase(row):
             continue
 
         pattern = r'(46,XX|46,XY)\[(\d+)\]'
+        match = re.search(pattern, segment)
+
         if match:
             return pattern
 
