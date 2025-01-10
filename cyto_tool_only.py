@@ -328,7 +328,7 @@ def metaphase(row):
         if segment.endswith('[1]'):
             continue
 
-        pattern = r'\[(\d+)\]'
+        pattern = r'\[(?:cp)?(\d+)\]'
         match = re.search(pattern, segment)
 
         if match:
