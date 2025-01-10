@@ -320,6 +320,18 @@ def diploid(row):
 
     return 0  # Not diploid
 
+def metaphase(row):
+    cytogenetics_value = row["processed_cg"]
+    segments = cytogenetics_value.split('/')
+
+    for segment in segments:
+        if segment.endswith('[1]'):
+            continue
+
+        pattern = r'(46,XX|46,XY)\[(\d+)\]'
+        if match:
+            return pattern
+
 
 # CG-RISK CALCULATION
 
@@ -427,6 +439,7 @@ def master_function(data):
     data["inv_del_t_3q"] = data.apply(lambda row: chr3abn(row), axis=1) #includes those with any amount of abnormalities 
     data["del17or17p"] = data.apply(lambda row: delseventeen(row), axis=1)
     data["diploid"] = data.apply(lambda row: diploid(row) if row['abn_total'] == 0 else 0, axis=1) #this function may need work
+    data["metaphase"] = data.apply(lambda row: metaphase(row), axis =1)
     data["cg_risk_score"] = data.apply(lambda row: cg_risk(row), axis=1)
 
     cols = [cytovar, "loss_of_y", "del11q","del5q", "del12p", "del20q", "del7q", "plus8", "plus19", "i17q", "minus7", "inv_del_t_3q", "del17or17p", "diploid", "cg_risk_score"]
