@@ -332,7 +332,7 @@ def metaphase(row):
         match = re.search(pattern, segment)
 
         if match:
-            metaphase_count = int(match.group(2))
+            metaphase_count = int(match.group(1))
             return metaphase_count
                 
 
