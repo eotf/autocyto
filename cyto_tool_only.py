@@ -332,9 +332,9 @@ def metaphase(row):
         match = re.search(pattern, segment)
 
         if match:
-            return pattern
-        else:
-            return "n/a"
+            metaphase_count = int(match.group(2))
+            return metaphase_count
+                
 
 
 # CG-RISK CALCULATION
