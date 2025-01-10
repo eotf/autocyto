@@ -328,11 +328,13 @@ def metaphase(row):
         if segment.endswith('[1]'):
             continue
 
-        pattern = r'(46,XX|46,XY)\[(\d+)\]'
+        pattern = r'[(\d+)\]'
         match = re.search(pattern, segment)
 
         if match:
             return pattern
+        else:
+            return "n/a"
 
 
 # CG-RISK CALCULATION
